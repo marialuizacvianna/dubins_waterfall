@@ -32,10 +32,10 @@ from matplotlib import gridspec
 # # the sizes, positions and colors.
 # ax.voxels(data, facecolors=colors, edgecolors='grey')
 
-point = [-20,0]
+point = [0,0]
 theta = 0
 x = array([[-40,0,0]]).T #x,y,theta
-v = 1
+v = 1*0.5
 L = 5
 dt   = 0.1
 X,Y,Th = [],[],[]
@@ -49,9 +49,9 @@ spec = gridspec.GridSpec(ncols=2, nrows=2,
 ax2 = fig.add_subplot(spec[0])
 ax2.set_sketch_params(length = 10)
 ax2.xmin=-50
-ax2.xmax=30
-ax2.ymin=-15
-ax2.ymax=15
+ax2.xmax=50
+ax2.ymin=-30
+ax2.ymax=30
 
 ax3 = fig.add_subplot(spec[2], projection='3d')
 axq = fig.add_subplot(spec[1])
@@ -202,7 +202,7 @@ def draw(x,t):
 
     pause(0.001)
 
-for t in arange(0,40,dt):
+for t in arange(0,10,dt):
     X.append(x[0,0])
     Y.append(x[1,0])
     Th.append(x[2,0])
@@ -218,6 +218,9 @@ for t in arange(0,40,dt):
     print("u = ",u)
     print("t = ",t)
     print("x = ", x)
+    x = array([[(40*cos(t*v)),
+                 (20*sin(2*t*v)),
+                 arctan2(2*20*v*cos(2*t*v),-2*20*v*sin(t*v)) ]]).T
     # x = array([[(-9.6* t**2  + 11.4*(0.5* t**3 - t) +30),
     #              (-9.6*(0.5* t**3 - t) - 11.4* t**2 + 30),
     #              arctan2((-14.4* t**2 +9.6 -22.8* t),(-19.2* t + 17.1* t**2 - 11.4)) ]]).T
