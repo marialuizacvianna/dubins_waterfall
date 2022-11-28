@@ -59,6 +59,11 @@ axq.xmin=-15
 axq.xmax=15
 axq.ymin=-0.5
 axq.ymax=50
+
+line = [[],[],[]]
+lines = []
+lines_in = []
+pt_inside = False
 # fig2 = plt.figure(0)
 # ax2 = fig2.add_subplot(111, aspect='equal')
 # ax2.xmin=-50
@@ -177,28 +182,48 @@ def draw_quotient(x,t,ax):
     ax.plot(M[0],M[1],color="k")
 
 def draw(x,t):
+    global line,lines,pt_inside,lines_in
     draw_waterfall(t,ax3)
     draw_visible(x,ax2)
     draw_contour(ax2)
     draw_tank(x,ax2)
     draw_quotient(x,t,axq)
-    x_line = []
-    y_line = []
-    z_line = []
-    for i in range(len(X)):
-        res,pt1,pt2 = in_rect(array([[X[i],Y[i],Th[i]]]).T,point)
-        if(res):
-            if(len(x_line) == 0):
-                if(i == 0):
-                    axq.plot(-pt2, pt1 + L, 'bo')
-                else:
-                    axq.plot(-pt2, 2*L + dt*i, 'bo')
 
-            y_line.append(i*dt)
-            x_line.append(-pt2)
-            z_line.append(pt1)
-    if(len(x_line) > 0):
-        ax3.plot(x_line,y_line,z_line,color="b")
+    if(len(X) > 0):
+        res,pt1,pt2 = in_rect(array([[X[-1],Y[-1],Th[-1]]]).T,point)
+        if(len(line[0]) != 0 and pt_inside != res):
+            lines.append(line)
+            lines_in.append(pt_inside)
+            line = [[],[],[]]
+        line[1].append(t)
+        line[0].append(pt1)
+        line[2].append(pt2)
+        pt_inside = res
+        if(pt_inside):
+            ax3.plot(line[0],line[1],line[2],color="b")
+        else:
+            ax3.plot(line[0],line[1],line[2],color="k")
+
+        for i in range(len(lines)):
+            l = lines[i]
+            if(lines_in[i]):
+                ax3.plot(l[0],l[1],l[2],color="b")
+            else:
+                ax3.plot(l[0],l[1],l[2],color="k")
+    #     if(res ):
+    #         ax3.plot(pt1,i*dt,pt2,color="b")
+    #         if(len(x_line) == 0):
+    #             if(i == 0):
+    #                 axq.plot(-pt2, pt1 + L, 'bo')
+    #             else:
+    #                 axq.plot(-pt2, 2*L + dt*i, 'bo')
+    #
+    #         y_line.append(i*dt)
+    #         x_line.append(pt1)
+    #         z_line.append(pt2)
+    # if(len(x_line) > 0):
+    #     ax3.plot(x_line,y_line,z_line,color="b")
+    # res_before = res
 
     pause(0.001)
 
@@ -207,9 +232,16 @@ for t in arange(0,40,dt):
     Y.append(x[1,0])
     Th.append(x[2,0])
     clear_2d(ax2)
+    ax2.set_xlabel("x world")
+    ax2.set_ylabel("y world")
+    ax2.set_title('Mosaic 2D')
     clear_2d(axq)
     ax2.plot(point[0], point[1], 'bo')
     clear_3d(ax3)
+    ax3.set_xlabel("x robot")
+    ax3.set_ylabel("Time (t)")
+    ax3.set_zlabel("y robot")
+    ax3.set_title('Waterfall 3D')
     err = theta - x[2,0]
     delta = pi*sin(err/2.)
     u = control(delta)
