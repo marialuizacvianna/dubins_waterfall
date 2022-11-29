@@ -16,8 +16,8 @@ X,Y,Th = [],[],[]
 # pause(5)
 fig = plt.figure(figsize=(50,20))
 
-spec = gridspec.GridSpec(ncols=2, nrows=2,
-                         width_ratios=[4,2], height_ratios=[1,2],wspace=0.1, hspace=0.5)
+spec = gridspec.GridSpec(ncols=2, nrows=1,
+                         width_ratios=[4,2], height_ratios=[1],hspace=0.5)
 
 ax2 = fig.add_subplot(spec[0])
 ax2.set_sketch_params(length = 10)
@@ -26,12 +26,12 @@ ax2.xmax=50
 ax2.ymin=-30
 ax2.ymax=30
 
-ax3 = fig.add_subplot(spec[2], projection='3d')
-axq = fig.add_subplot(spec[1])
-axq.xmin=-15
-axq.xmax=15
-axq.ymin=-0.5
-axq.ymax=50
+ax3 = fig.add_subplot(spec[1], projection='3d')
+# axq = fig.add_subplot(spec[1])
+# axq.xmin=-15
+# axq.xmax=15
+# axq.ymin=-0.5
+# axq.ymax=50
 
 line = [[],[],[]]
 lines = []
@@ -166,11 +166,14 @@ def draw(x,t):
     draw_visible(x,ax2)
     draw_contour(ax2)
     draw_tank(x,ax2)
-    draw_quotient(x,t,axq)
+    # draw_quotient(x,t,axq)
 
     if(len(X) > 0):
         res,pt1,pt2 = in_rect(array([[X[-1],Y[-1],Th[-1]]]).T,point)
         if(len(line[0]) != 0 and pt_inside != res):
+            line[1].append(t)
+            line[0].append(pt1)
+            line[2].append(pt2)
             lines.append(line)
             lines_in.append(pt_inside)
             line = [[],[],[]]
@@ -189,13 +192,13 @@ def draw(x,t):
                 ax3.plot(l[0],l[1],l[2],color="b")
             else:
                 ax3.plot(l[0],l[1],l[2],color="k")
-    #     if(res ):
-    #         ax3.plot(pt1,i*dt,pt2,color="b")
-    #         if(len(x_line) == 0):
-    #             if(i == 0):
-    #                 axq.plot(-pt2, pt1 + L, 'bo')
-    #             else:
-    #                 axq.plot(-pt2, 2*L + dt*i, 'bo')
+        # if(res ):
+        #     ax3.plot(pt1,i*dt,pt2,color="b")
+        #     if(len(line) == 1):
+        #         if(i == 0):
+        #             axq.plot(-pt2, pt1 + L, 'bo')
+        #         else:
+        #             axq.plot(-pt2, 2*L + dt*i, 'bo')
     #
     #         y_line.append(i*dt)
     #         x_line.append(pt1)
@@ -217,7 +220,7 @@ for t in arange(0,10,dt):
     ax2.set_xlabel("x world")
     ax2.set_ylabel("y world")
     ax2.set_title('Mosaic 2D')
-    clear_2d(axq)
+    # clear_2d(axq)
     ax2.plot(point[0], point[1], 'bo')
     clear_3d(ax3)
     ax3.set_xlabel("x robot")
