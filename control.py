@@ -5,33 +5,6 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 
-# # Create axis
-# axes = [5, 5, 5]
-#
-# # Create Data
-# data = np.ones([2,2,5], dtype=np.bool)
-#
-# print("data = ",data)
-# # Control Transparency
-# alpha = 0.9
-#
-# # Control colour
-# colors = np.empty([2,2,5] + [4], dtype=np.float32)
-# print("colors =", colors.shape)
-# colors[0] = [1, 0, 0, alpha]  # red
-# colors[1] = [0, 1, 0, alpha]  # green
-# # colors[2] = [0, 0, 1, alpha]  # blue
-# # colors[3] = [1, 1, 0, alpha]  # yellow
-# # colors[4] = [1, 1, 1, alpha]  # grey
-#
-# # Plot figure
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-#
-# # Voxels is used to customizations of
-# # the sizes, positions and colors.
-# ax.voxels(data, facecolors=colors, edgecolors='grey')
-
 point = [0,0]
 theta = 0
 x = array([[-40,0,0]]).T #x,y,theta
@@ -110,14 +83,20 @@ def draw_contour(ax):
         cnt_right.append([X[i] + L*sin(Th[i]),Y[i] - L*cos(Th[i])])
         cnt_left.append([X[i] - L*sin(Th[i]),Y[i] + L*cos(Th[i])])
 
+    M = array([ [-L,L,L,-L,-L],
+                [L,L,-L,-L,L],])
+
+    M_begin=move_motif(M,X[-1],Y[-1],Th[-1])
+
     cnt_rl.append(cnt_right[-1])
-    cnt_rl.append([cnt_right[-1][0] + L*cos(Th[i]),cnt_right[-1][1] + L*sin(Th[i])])
-    cnt_rl.append([cnt_left[-1][0] + L*cos(Th[i]),cnt_left[-1][1] + L*sin(Th[i])])
+    cnt_rl.append([M_begin[0,2],M_begin[1,2]])
+    cnt_rl.append([M_begin[0,1],M_begin[1,1]])
     cnt_rl.append(cnt_left[-1])
 
+    M_end=move_motif(M,X[0],Y[0],Th[0])
     cnt_lr.append(cnt_left[0])
-    cnt_lr.append([cnt_left[0][0] - L*cos(Th[i]),cnt_left[0][1] - L*sin(Th[i])])
-    cnt_lr.append([cnt_right[0][0] - L*cos(Th[i]),cnt_right[0][1] - L*sin(Th[i])])
+    cnt_lr.append([M_end[0,0],M_end[1,0]])
+    cnt_lr.append([M_end[0,3],M_end[1,3]])
     cnt_lr.append(cnt_right[0])
 
     cnt_right = array(cnt_right)
@@ -228,6 +207,9 @@ def draw(x,t):
     pause(0.001)
 
 for t in arange(0,10,dt):
+    x = array([[(40*cos(t*v)),
+                 (20*sin(2*t*v)),
+                 arctan2(2*20*v*cos(2*t*v),-2*20*v*sin(t*v)) ]]).T
     X.append(x[0,0])
     Y.append(x[1,0])
     Th.append(x[2,0])
@@ -242,17 +224,14 @@ for t in arange(0,10,dt):
     ax3.set_ylabel("Time (t)")
     ax3.set_zlabel("y robot")
     ax3.set_title('Waterfall 3D')
-    err = theta - x[2,0]
-    delta = pi*sin(err/2.)
-    u = control(delta)
-    x = f(x,u)
-    print("delta = ",delta)
-    print("u = ",u)
+    # err = theta - x[2,0]
+    # delta = pi*sin(err/2.)
+    # u = control(delta)
+    # x = f(x,u)
+    # print("delta = ",delta)
+    # print("u = ",u)
     print("t = ",t)
-    print("x = ", x)
-    x = array([[(40*cos(t*v)),
-                 (20*sin(2*t*v)),
-                 arctan2(2*20*v*cos(2*t*v),-2*20*v*sin(t*v)) ]]).T
+    # print("x = ", x)
     # x = array([[(-9.6* t**2  + 11.4*(0.5* t**3 - t) +30),
     #              (-9.6*(0.5* t**3 - t) - 11.4* t**2 + 30),
     #              arctan2((-14.4* t**2 +9.6 -22.8* t),(-19.2* t + 17.1* t**2 - 11.4)) ]]).T
